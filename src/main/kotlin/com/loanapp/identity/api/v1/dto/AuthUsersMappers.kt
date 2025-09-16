@@ -1,4 +1,4 @@
-package com.loanapp.identity.api.dto
+package com.loanapp.identity.api.v1.dto
 
 import com.loanapp.identity.domain.AuthUser
 

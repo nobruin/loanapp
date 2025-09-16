@@ -1,5 +1,6 @@
 package com.loanapp.identity.domain
 
+import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.Instant
 
 class AuthUser(

@@ -1,5 +1,7 @@
 package com.loanapp.identity.domain
 
+import org.springframework.security.crypto.password.PasswordEncoder
+
 class Password private constructor(private val hash: String) {
 
     fun matches(rawPassword: String, encoder: PasswordEncoder): Boolean {

@@ -2,7 +2,7 @@ package com.loanapp.identity.domain
 
 class Email(val value: String) {
     init {
-        require(value.isBlank()) {"Email cannot be blank"}
+        require(value.isNotBlank()) {"Email cannot be blank"}
         require(Regex("^[^@]+@[^@]+\\.[^@]+\$").matches(value)) { "Invalid email format" }
     }
 
