@@ -15,7 +15,7 @@ class RegisterUserService(
     private val authUserRepository: AuthUserRepository
 ) {
 
-    fun register(email: String, rawPassword: String): AuthUser{
+    fun registerOrThrow(email: String, rawPassword: String): AuthUser{
         val emailVo = Email(email)
 
         authUserRepository.findByEmail(emailVo)?.let {
