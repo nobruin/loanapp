@@ -4,20 +4,24 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.loanapp.identity.api.v1.dto.RegisterUserRequest
 import com.loanapp.identity.domain.AuthUserRepository
 import com.loanapp.identity.domain.Email
+import com.loanapp.identity.domain.Password
 import com.loanapp.shared.BaseIntegrationTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 
-class AuthControllerIntegrationTest @Autowired constructor(
+class RegisterUserIntegrationTest @Autowired constructor(
     val mockMvc: MockMvc,
     val objectMapper: ObjectMapper,
-    val authUserRepository: AuthUserRepository
+    val authUserRepository: AuthUserRepository,
+    val encoder: PasswordEncoder
 ): BaseIntegrationTest() {
 
     @Test
@@ -25,7 +29,7 @@ class AuthControllerIntegrationTest @Autowired constructor(
         val emailToSave = "user@example.com"
         val request = RegisterUserRequest(
             email = emailToSave,
-            password = "12345@AB"
+            password = VALID_PASSWORD
         )
 
         val mvcResult = mockMvc.post(REGISTER_URL) {
@@ -43,6 +47,7 @@ class AuthControllerIntegrationTest @Autowired constructor(
         val savedUser = authUserRepository.findByEmail(Email(emailToSave))
         assertNotNull(savedUser)
         assertEquals(emailToSave, savedUser.email.value)
+        assertTrue(savedUser.verifyPassword(VALID_PASSWORD, encoder))
     }
 
 
