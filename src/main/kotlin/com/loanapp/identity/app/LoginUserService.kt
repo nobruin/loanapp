@@ -16,9 +16,9 @@ class LoginUserService(
         val user = authUserRepository.findByEmail(Email(email))
             ?: throw IllegalArgumentException("User not found")
 
-        if (!user.verifyPassword(rawPassword, encoder)) {
-            throw IllegalArgumentException("Invalid credentials")
-        }
+        require(user.verifyPassword(rawPassword, encoder)) {"Invalid credentials"}
+
+
 
         return user
     }
