@@ -19,3 +19,5 @@ spring:
       path: /h2-console
 server:
   port: 8080
+jwt:
+  secret: 5Lgfzir2cekaroSG2Q8wUJ7CAWUbNIcq
