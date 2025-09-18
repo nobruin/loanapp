@@ -16,7 +16,7 @@ import javax.crypto.SecretKey
 
 @Component
 class JwtProvider(
-    @field:Value("\${jwt.secret}")
+    @param:Value("\${jwt.secret}")
     private val secretWord: String,
     private val expirationMillis: Long = TimeUnit.HOURS.toMillis(1) // 1h
 ) : TokenProvider {
