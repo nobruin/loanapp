@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service
 class LoginUserService(
     private val authUserRepository: AuthUserRepository,
     private val encoder: PasswordEncoder,
-
     private val tokenProvider: TokenProvider,
 ) {
     fun loginOrThrow(

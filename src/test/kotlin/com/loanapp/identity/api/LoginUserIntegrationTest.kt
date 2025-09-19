@@ -13,7 +13,6 @@ import com.loanapp.identity.infra.persistence.AuthUserJpaRepository
 import com.loanapp.shared.BaseIntegrationTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNotNull
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.context.TestConstructor
@@ -32,7 +31,6 @@ class LoginUserIntegrationTest(
     val encoder: PasswordEncoder,
     val tokenProvider: TokenProvider,
 ) : BaseIntegrationTest() {
-
     @BeforeEach
     fun setup() {
         jpaRepository.deleteAll()
@@ -63,7 +61,7 @@ class LoginUserIntegrationTest(
         val responseBody = result.response.contentAsString
         val loginResponse = objectMapper.readValue(responseBody, LoginResponse::class.java)
         val extractedUserId = tokenProvider.extractUserId(loginResponse.token)
-        
+
         assertTrue(
             tokenProvider.validateToken(loginResponse.token),
             "The user token must be a valid token",
