@@ -58,6 +58,10 @@ tasks.named('test') {
     finalizedBy(tasks.jacocoTestReport)
 }
 
+tasks.named("sonar") {
+    dependsOn(tasks.jacocoTestReport)
+}
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
@@ -67,8 +71,18 @@ tasks.jacocoTestReport {
     }
 }
 
-sonarqube {
+sonar {
     properties {
-        property("sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+        property("sonar.projectKey", "nobruin_loanapp")
+        property("sonar.organization", "nobruin")
+        property("sonar.host.url", "https://sonarcloud.io")
+
+        property("sonar.sources", "src/main/kotlin")         // source code location
+        property("sonar.tests", "src/test/kotlin")          // test code location
+        property("sonar.sourceEncoding", "UTF-8")           // file encoding
+
+        // coverage reports
+        property("sonar.junit.reportPaths", "build/test-results/test")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
