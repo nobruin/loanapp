@@ -20,7 +20,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # Cache Gradle dependencies for faster builds
+      # Cache Gradle dependencies
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -29,6 +29,14 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
+
+      # Run KtLint check first
+      - name: KtLint Check
+        run: ./gradlew ktlintCheck --no-daemon
+
+      # Check commit message format
+      - name: Validate Commit Messages
+        uses: wagoid/commitlint-github-action@v6
 
       # Build project, run tests and generate coverage report
       - name: Build and Test

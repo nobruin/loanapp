@@ -5,7 +5,7 @@ MSG_FILE=$1
 COMMIT_MSG=$(cat "$MSG_FILE")
 
 # Regex do Conventional Commit (exemplo simples)
-PATTERN="^(feat|fix|docs|style|refactor|perf|test|chore)(\([a-z]+\))?: .{1,50}"
+PATTERN="^(feat|fix|docs|style|refactor|perf|test|chore|ci)(\([a-z]+\))?: .{1,50}"
 
 if ! [[ "$COMMIT_MSG" =~ $PATTERN ]]; then
     echo "ERROR: Commit message does not follow Conventional Commits:"
