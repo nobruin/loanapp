@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Get the list of staged Kotlin files to check
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMRTUXB | grep -E '\.(kt|kts)$')
+
+# If there are staged Kotlin files, run ktlint on them
+if [ -n "$STAGED_FILES" ]; then
+  echo "--- Running ktlint on staged files ---"
+
+  # Use the --continue-on-error option to allow gradle to finish even if errors are found
+  ./gradlew ktlintFormat -Pktlint.stagedFiles="$STAGED_FILES" --continue-on-error
+
+  # Check the exit code of the ktlintFormat task
+  if [ $? -ne 0 ]; then
+    echo "ktlint found issues that could not be fixed automatically."
+    echo "Please fix the problems manually and try again."
+    exit 1
+  fi
+
+  # Add back any formatted changes to the commit
+  git add "$STAGED_FILES"
+fi
+
+exit 0
