@@ -6,7 +6,8 @@ plugins {
 	id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
     id 'java'
     id 'jacoco'
-    id("org.sonarqube") version "6.3.1.5724"
+    id 'org.sonarqube' version "6.3.1.5724"
+    id 'org.jlleitschuh.ktlint' version '12.1.1'
 }
 
 group = 'com.loanapp'
@@ -77,12 +78,16 @@ sonar {
         property("sonar.organization", "nobruin")
         property("sonar.host.url", "https://sonarcloud.io")
 
-        property("sonar.sources", "src/main/kotlin")         // source code location
-        property("sonar.tests", "src/test/kotlin")          // test code location
-        property("sonar.sourceEncoding", "UTF-8")           // file encoding
+        property("sonar.sources", "src/main/kotlin")
+        property("sonar.tests", "src/test/kotlin")
+        property("sonar.sourceEncoding", "UTF-8")
 
         // coverage reports
         property("sonar.junit.reportPaths", "build/test-results/test")
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
+}
+
+ktlint {
+    installGitPreCommitHook(true)
 }

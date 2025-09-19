@@ -30,6 +30,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
 
+      # Run Ktlint check
+      - name: Run Ktlint check
+        run: ./gradlew ktlintCheck --no-daemon
+
       # Build project, run tests and generate coverage report
       - name: Build and Test
         run: ./gradlew build jacocoTestReport --no-daemon
