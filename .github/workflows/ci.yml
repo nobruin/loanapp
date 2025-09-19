@@ -20,7 +20,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # Cache Gradle dependencies
+      # Cache Gradle dependencies for faster builds
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 class LoginUserService(
     private val authUserRepository: AuthUserRepository,
     private val encoder: PasswordEncoder,
+
     private val tokenProvider: TokenProvider,
 ) {
     fun loginOrThrow(
@@ -22,6 +23,7 @@ class LoginUserService(
                 ?: throw IllegalArgumentException("User not found")
 
         require(user.verifyPassword(rawPassword, encoder)) { "Invalid credentials" }
+
         val token = tokenProvider.generateToken(user.id)
         return token to user.id
     }
