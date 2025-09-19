@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ktlint
+        name: ktlint via Gradle
+        entry: ./gradlew ktlintCheck --console=plain
+        language: system
+        pass_filenames: false
+        types: [kotlin]
+
+      - id: commit-message
+        name: Commit message lint
+        entry: ./scripts/commit-msg-hook.sh
+        language: system
+        stages: [ commit-msg ]

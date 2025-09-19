@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Authentication", description = "Endpoints for user registration and authentication")
 class AuthController(
     private val registerUserService: RegisterUserService,
-    private val loginUserService: LoginUserService
+    private val loginUserService: LoginUserService,
 ) {
-
     @PostMapping("register")
     @Operation(
         summary = "Register a new user",
@@ -33,18 +32,20 @@ class AuthController(
             ApiResponse(
                 responseCode = "200",
                 description = "User registered successfully",
-                content = [Content(mediaType = "application/json", schema = Schema(implementation = RegisterUserResponse::class))]
+                content = [Content(mediaType = "application/json", schema = Schema(implementation = RegisterUserResponse::class))],
             ),
             ApiResponse(responseCode = "409", description = "Email already exists", content = [Content()]),
-            ApiResponse(responseCode = "400", description = "Invalid request payload", content = [Content()])
-        ]
+            ApiResponse(responseCode = "400", description = "Invalid request payload", content = [Content()]),
+        ],
     )
     fun register(
-        @RequestBody body: RegisterUserRequest
-    ): RegisterUserResponse = registerUserService.registerOrThrow(
-        body.email,
-        body.password
-    ).toResponse()
+        @RequestBody body: RegisterUserRequest,
+    ): RegisterUserResponse =
+        registerUserService
+            .registerOrThrow(
+                body.email,
+                body.password,
+            ).toResponse()
 
     @PostMapping("login")
     @Operation(
@@ -54,20 +55,19 @@ class AuthController(
             ApiResponse(
                 responseCode = "200",
                 description = "Authenticated",
-                content = [Content(mediaType = "application/json", schema = Schema(implementation = LoginResponse::class))]
+                content = [Content(mediaType = "application/json", schema = Schema(implementation = LoginResponse::class))],
             ),
-            ApiResponse(responseCode = "401", description = "Invalid credentials", content = [Content()])
-        ]
+            ApiResponse(responseCode = "401", description = "Invalid credentials", content = [Content()]),
+        ],
     )
     fun login(
-        @RequestBody body: LoginRequest
+        @RequestBody body: LoginRequest,
     ): LoginResponse {
         val (token, userId) = loginUserService.loginOrThrow(body.email, body.password)
         return LoginResponse(
             userId = userId.value.toString(),
-            email =  body.email,
-            token = token
+            email = body.email,
+            token = token,
         )
     }
-
 }
