@@ -11,15 +11,14 @@ import org.springframework.stereotype.Component
 import java.lang.Exception
 import java.util.Date
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
 @Component
-class JwtProvider(
+class JwtTokenProvider(
     @param:Value("\${jwt.secret}")
     private val secretWord: String,
     @Value("\${jwt.expiration-ms}")
-    private val expirationMillis: Long
+    private val expirationMillis: Long,
 ) : TokenProvider {
     private val secretKey: SecretKey by lazy {
         Keys.hmacShaKeyFor(secretWord.toByteArray(Charsets.UTF_8))
@@ -29,7 +28,8 @@ class JwtProvider(
         val now = Date()
         val expiry = Date(now.time + expirationMillis)
 
-        return Jwts.builder()
+        return Jwts
+            .builder()
             .subject(userId.value.toString())
             .issuedAt(now)
             .expiration(expiry)
@@ -37,9 +37,10 @@ class JwtProvider(
             .compact()
     }
 
-    override fun validateToken(token: String): Boolean {
-        return try {
-            Jwts.parser()
+    override fun validateToken(token: String): Boolean =
+        try {
+            Jwts
+                .parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
@@ -54,15 +55,16 @@ class JwtProvider(
             println("An error occurred: ${ex.message}")
             false
         }
-    }
 
     override fun extractUserId(token: String): UserId? {
         return try {
-            val claims = Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .payload
+            val claims =
+                Jwts
+                    .parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .payload
 
             val subject = claims.subject ?: return null
             UserId(UUID.fromString(subject))

@@ -7,9 +7,10 @@ class AuthUser(
     val id: UserId,
     val email: Email,
     var password: Password,
-    val createdAt: Instant = Instant.now()
+    val createdAt: Instant = Instant.now(),
 ) {
-    fun verifyPassword(rawPassword: String, encoder: PasswordEncoder): Boolean{
-        return password.matches(rawPassword, encoder)
-    }
+    fun verifyPassword(
+        rawPassword: String,
+        encoder: PasswordEncoder,
+    ): Boolean = password.matches(rawPassword, encoder)
 }

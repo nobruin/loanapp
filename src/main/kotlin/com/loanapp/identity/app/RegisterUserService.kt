@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service
 @Service
 class RegisterUserService(
     private val encoder: PasswordEncoder,
-    private val authUserRepository: AuthUserRepository
+    private val authUserRepository: AuthUserRepository,
 ) {
-
-    fun registerOrThrow(email: String, rawPassword: String): AuthUser{
+    fun registerOrThrow(
+        email: String,
+        rawPassword: String,
+    ): AuthUser {
         val emailVo = Email(email)
 
         authUserRepository.findByEmail(emailVo)?.let {
@@ -23,13 +25,13 @@ class RegisterUserService(
         }
 
         val password = Password.fromPlainText(rawPassword, encoder)
-        val user = AuthUser(
-            id = UserId.new(),
-            email = emailVo,
-            password = password
-        )
+        val user =
+            AuthUser(
+                id = UserId.new(),
+                email = emailVo,
+                password = password,
+            )
 
         return authUserRepository.save(user)
     }
-
 }
