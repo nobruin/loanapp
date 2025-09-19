@@ -2,55 +2,40 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      # Checkout the repository
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      # Set up JDK 21
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-          cache: gradle
 
-      - name: Cache Gradle
+      # Cache Gradle dependencies for faster builds
+      - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
-            ~/.gradle/wrapper/
+            ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          restore-keys: ${{ runner.os }}-gradle
 
-      - name: Build with Gradle
-        run: ./gradlew clean build jacocoTestReport
+      # Build project, run tests and generate coverage report
+      - name: Build and Test
+        run: ./gradlew build jacocoTestReport --no-daemon
 
+      # Run SonarCloud analysis
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: build/test-results/test
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: build/reports/jacoco/test
+        run: ./gradlew sonar --no-daemon
