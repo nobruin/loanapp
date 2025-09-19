@@ -62,11 +62,11 @@ class AuthController(
     fun login(
         @RequestBody body: LoginRequest
     ): LoginResponse {
-        val user = loginUserService.loginOrThrow(body.email, body.password)
+        val (token, userId) = loginUserService.loginOrThrow(body.email, body.password)
         return LoginResponse(
-            userId = user.id.value.toString(),
-            email =  user.email.value,
-            token = "jwt-token"
+            userId = userId.value.toString(),
+            email =  body.email,
+            token = token
         )
     }
 
