@@ -11,4 +11,5 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
 jwt:
-  secret: fake-secret-key
+  secret: the-strongest-word-from-dev-test-of-integration-with-64-bytes-for-HS512
+  expiration-ms: 10800000
