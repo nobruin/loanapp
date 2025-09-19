@@ -14,6 +14,5 @@ data class AuthUserEntity(
     @Column(nullable = false, unique = true)
     val email: String,
     @Column(nullable = false)
-    val password: String
+    val password: String,
 )
-

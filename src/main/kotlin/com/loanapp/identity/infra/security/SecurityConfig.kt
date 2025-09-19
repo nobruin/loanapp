@@ -9,10 +9,8 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 class SecurityConfig {
-
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
-
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain =
@@ -25,9 +23,9 @@ class SecurityConfig {
                         "/v1/auth/login",
                         "/v3/api-docs/**",
                         "/swagger-ui.html",
-                        "/swagger-ui/**"
+                        "/swagger-ui/**",
                     ).permitAll()
-                    .anyRequest().authenticated()
+                    .anyRequest()
+                    .authenticated()
             }.build()
-
 }
