@@ -18,7 +18,8 @@ import javax.crypto.SecretKey
 class JwtProvider(
     @param:Value("\${jwt.secret}")
     private val secretWord: String,
-    private val expirationMillis: Long = TimeUnit.HOURS.toMillis(1) // 1h
+    @Value("\${jwt.expiration-ms}")
+    private val expirationMillis: Long
 ) : TokenProvider {
     private val secretKey: SecretKey by lazy {
         Keys.hmacShaKeyFor(secretWord.toByteArray(Charsets.UTF_8))
