@@ -6,21 +6,17 @@ on:
   pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout the repository
       - uses: actions/checkout@v4
 
-      # Set up JDK 21
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # Cache Gradle dependencies for faster builds
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -30,15 +26,34 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      # Run Ktlint check
-      - name: Run Ktlint check
+      # Run only lint
+      - name: Run ktlint
         run: ./gradlew ktlintCheck --no-daemon
 
-      # Build project, run tests and generate coverage report
+  build:
+    runs-on: ubuntu-latest
+    needs: lint   # só roda build depois que o lint passar
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
       - name: Build and Test
         run: ./gradlew build jacocoTestReport --no-daemon
 
-      # Run SonarCloud analysis
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
