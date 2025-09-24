@@ -1,5 +1,5 @@
 # --- Stage 1: Build the Application ---
-FROM eclipse-temurin:21-jdk as builder
+FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
@@ -17,4 +17,4 @@ COPY --from=builder /app/build/libs/app.jar app.jar
 # Expose the port that Spring Boot uses
 EXPOSE 8080
 # Define the entrypoint command to run the application
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
