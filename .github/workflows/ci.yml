@@ -39,8 +39,10 @@ jobs:
         uses: wagoid/commitlint-github-action@v6
 
       # Build project, run tests and generate coverage report
-      - name: Build and Test
+      - name: Run Tests
         run: ./gradlew build jacocoTestReport --no-daemon
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
       # Run SonarCloud analysis
       - name: SonarCloud Scan

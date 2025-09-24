@@ -1,24 +1,18 @@
 spring:
+  profiles:
+    active: ${ENV_PROFILE:dev}
+
   application:
-    name: "LoanAppBackend"
-  datasource:
-    url: jdbc:h2:mem:loanappdb;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    name: LoanAppBackend
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-server:
-  port: 8080
-jwt:
-  secret: c1d567104b2b3a8d9e6f0c4f8d5c7b3a9e0f6b3d4f8e0c2f1e9d0a7b4f5d6e1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a
-  expiration-ms: 10800000
+    open-in-view: false
+
+logging:
+  level:
+    root: INFO
+
