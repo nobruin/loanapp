@@ -7,11 +7,16 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
 jwt:
   secret: the-strongest-word-from-dev-test-of-integration-with-64-bytes-for-HS512
   expiration-ms: 10800000

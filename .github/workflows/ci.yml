@@ -3,24 +3,23 @@ name: CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
+  workflow_run:
+    workflows: ["Validate PR Title"]
+    types:
+      - completed
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - uses: actions/checkout@v4
-
-      # Set up JDK 21
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-
-      # Cache Gradle dependencies for faster builds
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -29,22 +28,12 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
-
-      # Run KtLint check first
       - name: KtLint Check
         run: ./gradlew ktlintCheck --no-daemon
-
-      # Check commit message format
-      - name: Validate Commit Messages
-        uses: wagoid/commitlint-github-action@v6
-
-      # Build project, run tests and generate coverage report
       - name: Run Tests
         run: ./gradlew build jacocoTestReport --no-daemon
         env:
           SPRING_PROFILES_ACTIVE: test
-
-      # Run SonarCloud analysis
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
