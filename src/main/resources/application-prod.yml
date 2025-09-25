@@ -17,6 +17,17 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
-jwt:
-  secret: ${JWT_SECRET_WORD}
-  expiration-ms: 10800000
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://${AUTH0_DOMAIN}/.well-known/jwks.json
+          issuer-uri: https://${AUTH0_DOMAIN}/
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework: WARN
+    org.hibernate.SQL: ERROR
+    com.LoanAppBackend: INFO
