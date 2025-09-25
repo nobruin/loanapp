@@ -11,7 +11,3 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
-
-logging:
-  level:
-    org.flywaydb: DEBUG

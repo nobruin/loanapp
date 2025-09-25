@@ -21,7 +21,7 @@ class OpenApiConfig {
                     .license(License().name("MIT").url("https://opensource.org/licenses/MIT"))
                     .contact(
                         Contact()
-                            .name("Loan App Team"),
+                            .name("bruno.marins nobruin@gmail.com"),
                     ),
             ).externalDocs(
                 ExternalDocumentation()
