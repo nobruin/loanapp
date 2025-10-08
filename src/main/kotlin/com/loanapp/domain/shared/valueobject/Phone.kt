@@ -1,6 +1,8 @@
 package com.loanapp.domain.shared.valueobject
 
-data class Phone(val value: String) {
+data class Phone(
+    val value: String,
+) {
     init {
         require(isValid(value)) { "Invalid phone number: $value" }
     }

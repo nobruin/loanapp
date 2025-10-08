@@ -5,6 +5,8 @@ import com.loanapp.domain.shared.valueobject.Id
 
 interface CustomerRepository {
     fun save(customer: Customer): Customer
+
     fun findById(id: Id<Customer>): Customer?
+
     fun findByCpf(cpf: Cpf): Customer?
 }
