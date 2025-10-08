@@ -54,8 +54,10 @@ class IdTest {
         val id1 = Id.fromString<Any>(uuid.toString())
         val id2 = Id.fromString<Any>(uuid.toString())
 
-        assertEquals(id1, id2)
-        assertEquals(id1.hashCode(), id2.hashCode())
+        assertTrue {
+            id1 == id2
+            id1.hashCode() == id2.hashCode()
+        }
     }
 
     @Test
