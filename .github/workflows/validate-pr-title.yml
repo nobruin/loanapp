@@ -1,7 +1,6 @@
 name: Validate PR Title
 
 on:
-  # The action must be performed for every PR that is opened/reopened, edited or synchronized
   pull_request:
     types: [opened, edited, synchronize, reopened]
 

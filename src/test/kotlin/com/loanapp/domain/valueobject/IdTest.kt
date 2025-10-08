@@ -14,14 +14,14 @@ class IdTest {
         val id1 = Id.new<Any>()
         val id2 = Id.new<Any>()
 
-        assertNotEquals(id1,id2)
+        assertNotEquals(id1, id2)
         assertTrue {
             id1.toString().isNotBlank() && id2.toString().isNotBlank()
         }
     }
 
     @Test
-    fun `should create an Id with valid UUID`(){
+    fun `should create an Id with valid UUID`() {
         val uuid = UUID.randomUUID()
         val id = Id.fromString<Any>(uuid.toString())
 
@@ -30,18 +30,20 @@ class IdTest {
 
     @Test
     fun `should throw exception for blank Id`() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            Id.fromString<Any>("")
-        }
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                Id.fromString<Any>("")
+            }
 
         assertEquals("Id cannot be blank", exception.message)
     }
 
     @Test
     fun `should throw exception for invalid UUID format`() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            Id.fromString<Any>("not-a-uuid")
-        }
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                Id.fromString<Any>("not-a-uuid")
+            }
 
         assertTrue(exception.message!!.contains("Invalid UUID format"))
     }

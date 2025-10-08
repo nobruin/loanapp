@@ -8,29 +8,33 @@ import org.junit.jupiter.params.provider.ValueSource
 import kotlin.test.assertEquals
 
 class PhoneTest {
-
     @ParameterizedTest
-    @ValueSource(strings = [
-        "+99999999999",
-        "+12345678901234",
-        "99999999999",
-        "12345678901234"
-    ])
+    @ValueSource(
+        strings = [
+            "+99999999999",
+            "+12345678901234",
+            "99999999999",
+            "12345678901234",
+        ],
+    )
     fun `should accept valid phone numbers`(number: String) {
         assertDoesNotThrow { Phone(number) }
     }
 
     @ParameterizedTest
-    @ValueSource(strings = [
-        "+(99)999999999",
-        "+123-456-789-01234",
-        "(99)9999-99999",
-        "123-456-789-01234"
-    ])
-    fun `should reject a invalid Email`(number: String){
-        val exception =  assertThrows<IllegalArgumentException> {
-            Phone(number)
-        }
-        assertEquals(exception.message,"Invalid phone number: $number" )
+    @ValueSource(
+        strings = [
+            "+(99)999999999",
+            "+123-456-789-01234",
+            "(99)9999-99999",
+            "123-456-789-01234",
+        ],
+    )
+    fun `should reject a invalid Email`(number: String) {
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                Phone(number)
+            }
+        assertEquals(exception.message, "Invalid phone number: $number")
     }
 }

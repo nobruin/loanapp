@@ -1,6 +1,8 @@
 package com.loanapp.domain.shared.valueobject
 
-data class Cpf(val value: String) {
+data class Cpf(
+    val value: String,
+) {
     init {
         require(isValid(value)) { "Invalid CPF: $value" }
     }
