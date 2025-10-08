@@ -1,15 +1,14 @@
-name: CI / Build and Test
+name: CI
 
 on:
-  # Run after the "Validate PR Title" finishes successfully
   workflow_run:
-    workflows: ["Validate PR Title"]
+    workflows: ["Validate PR Title", "Validate Commit Messages"]
     types:
       - completed
 
 jobs:
   build:
-    # run only when "PR title" is valid
+    name: Build and Test
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
