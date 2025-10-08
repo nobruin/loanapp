@@ -49,10 +49,20 @@ class IdTest {
     }
 
     @Test
-    fun `should compare Ids by value`() {
+    fun `should compare Ids by value from string`() {
         val uuid = UUID.randomUUID()
         val id1 = Id.fromString<Any>(uuid.toString())
         val id2 = Id.fromString<Any>(uuid.toString())
+
+        assertEquals(id1, id2)
+        assertEquals(id1.hashCode(), id2.hashCode())
+    }
+
+    @Test
+    fun `should compare Ids by value from uuid`() {
+        val uuid = UUID.randomUUID()
+        val id1 = Id.from<Any>(uuid)
+        val id2 = Id.from<Any>(uuid)
 
         assertEquals(id1, id2)
         assertEquals(id1.hashCode(), id2.hashCode())
