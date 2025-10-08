@@ -1,4 +1,4 @@
-name: CI
+name: CI / Build and Test
 
 on:
   # Run after the "Validate PR Title" finishes successfully
