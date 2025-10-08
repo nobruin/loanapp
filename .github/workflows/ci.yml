@@ -1,8 +1,7 @@
 name: CI
 
 on:
-  push:
-    branches: [ "main" ]
+  # Run after the "Validate PR Title" finishes successfully
   workflow_run:
     workflows: ["Validate PR Title"]
     types:
@@ -10,16 +9,20 @@ on:
 
 jobs:
   build:
+    # run only when "PR title" is valid
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -28,12 +31,15 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
-      - name: KtLint Check
+
+      - name: Run KtLint
         run: ./gradlew ktlintCheck --no-daemon
-      - name: Run Tests
+
+      - name: Run Tests and Build
         run: ./gradlew build jacocoTestReport --no-daemon
         env:
           SPRING_PROFILES_ACTIVE: test
+
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
