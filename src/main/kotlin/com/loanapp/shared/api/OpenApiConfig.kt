@@ -21,11 +21,11 @@ class OpenApiConfig {
                     .license(License().name("MIT").url("https://opensource.org/licenses/MIT"))
                     .contact(
                         Contact()
-                            .name("bruno.marins nobruin@gmail.com"),
+                            .name("nobruin nobruin@gmail.com"),
                     ),
             ).externalDocs(
                 ExternalDocumentation()
                     .description("Project documentation")
-                    .url("https://github.com/your-org/loan-app-backend"),
+                    .url("https://github.com/nobruin/loanapp-backend"),
             )
 }
