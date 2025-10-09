@@ -1,26 +1,62 @@
 # Loan App Backend
 
-A Kotlin Spring Boot backend for a loan application system. This is a study project and an example implementation of Domain-Driven Design (DDD). It currently provides identity features such as user registration, with H2 in-memory database, Spring Security, and JPA.
+A Kotlin Spring Boot backend for a loan application system. This is a study project and an example of Domain-Driven Design (DDD). It offers identity features like user registration, using **PostgreSQL** as the primary database for development and production, with Spring Security and JPA. **H2** is used only for integration testing.
 
 ## Quick Start
 
 ### Prerequisites
-- Java 21 (or compatible JDK)
-- No need to install Gradle — the project uses the Gradle Wrapper
+- Java 21 (or any compatible JDK)
+- Python 3 and pip (required for pre-commit hooks)
+- Docker and Docker Compose (recommended for local development)
+- No need to install Gradle — the Gradle Wrapper is included
 
-### Running the Application
+### Running with Docker (Recommended)
+```bash
+docker-compose up --build
+```
+The API will be available at `http://localhost:8080` and PostgreSQL at `localhost:5432`.
+
+### Running Locally (without Docker)
+Make sure a PostgreSQL instance is running locally with the following defaults:
+- host: `localhost`
+- port: `5432`
+- database: `loanapp`
+- user: `postgres`
+- password: `postgres`
+
+Then start the application:
 ```bash
 ./gradlew bootRun
 ```
 
-The app will start on `http://localhost:8080`.
+### Integration Testing
+Integration tests use **H2 in-memory** database automatically. There is no need to configure H2 for development or production.
 
-### H2 Database Console
-```text
-URL:      http://localhost:8080/h2-console
-JDBC URL: jdbc:h2:mem:loanappdb
-User:     sa
-Password: (leave empty)
+## Database Configuration
+- **Development & Production:** PostgreSQL (see configs in `application-dev.yml` and `application-prod.yml`)
+- **Tests:** H2 in-memory (test environments only)
+
+## Pre-commit Hooks
+Pre-commit is used to ensure code quality and commit conventions.
+
+To install the hooks:
+```bash
+bash scripts/setup.sh
+```
+> ⚠️ **Important:**
+> The script *does not* install pip. You must install it manually, for example (on Ubuntu):
+> ```bash
+> sudo apt install python3 python3-pip -y
+> ```
+
+The script will:
+- Check for Python 3
+- Install pre-commit using pip
+- Set up hooks for Kotlin lint (ktlint) and Conventional Commits
+
+To run the hooks manually:
+```bash
+pre-commit run --all-files
 ```
 
 ## Documentation
@@ -44,11 +80,14 @@ Domain-Driven Design principles, strategic vision, and project structure.
 ### 🔌 [API Documentation](docs/api.md)
 REST API endpoints, request/response examples, and security details.
 
+### H2 Database Console
+**Note:** The H2 console is now only used in integration test environments, not in development or production.
+
 ## Current Features
 
 - ✅ User registration with email validation
 - ✅ Password encryption using BCrypt
-- ✅ H2 in-memory database with console access
+- ✅ PostgreSQL database (H2 only for integration tests)
 - ✅ Spring Security configuration
 - ✅ Domain-driven architecture
 - ✅ Integration tests with test coverage
