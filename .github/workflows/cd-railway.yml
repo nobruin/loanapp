@@ -1,20 +1,20 @@
-name: Deploy to Railway on Tag
+name: Deploy to Railway on Tag 🚀
 
 on:
   push:
     tags:
-      - 'v*'   #fires only when a tag is created example v1.0.0
+      - 'v*'   # Fires only when a tag is created, e.g., v1.0.0
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
     steps:
-      - name: Checkout repository
+      - name: Checkout repository 🔎
         uses: actions/checkout@v4
 
-      - name: Deploy to Railway
-        uses: railwayapp/railway-action@v2
-        with:
-          railwayToken: ${{ secrets.RAILWAY_TOKEN }}
-          serviceId: ${{ secrets.RAILWAY_SERVICE_ID }}
-          projectId: ${{ secrets.RAILWAY_PROJECT_ID }}
+      - name: Deploy to Railway 🚂
+        run: railway up --service=${{ env.RAILWAY_PROJECT_ID }}
