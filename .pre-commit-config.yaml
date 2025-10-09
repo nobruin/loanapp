@@ -8,6 +8,13 @@ repos:
         pass_filenames: false
         types: [kotlin]
 
+      - id: ktlint
+        name: ktlint via Gradle
+        entry: ./gradlew ktlintFormat --console=plain
+        language: system
+        pass_filenames: false
+        types: [ kotlin ]
+
       - id: commit-message
         name: Commit message lint
         entry: ./scripts/commit-msg-hook.sh
