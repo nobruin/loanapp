@@ -12,8 +12,8 @@ java -version
 ## Tech Stack
 - **Language**: Kotlin (JVM)
 - **Framework**: Spring Boot 3
-- **Persistence**: Spring Data JPA, H2 (in-memory)
-- **Security**: Spring Security (BCrypt)
+- **Persistence**: Spring Data JPA, PostgreSQL for development/production, H2 (in-memory) for integration testing
+- **Security**: Spring Security (OAuth2 with Okta)
 - **Build**: Gradle (Wrapper included)
 - **Testing**: JUnit 5, Spring Boot Test, Spring Security Test
 - **Coverage**: JaCoCo
@@ -22,12 +22,11 @@ java -version
 
 ### Application Configuration
 Default configuration is defined in `src/main/resources/application.yml`:
-- H2 in-memory database at `jdbc:h2:mem:loanappdb`
-- H2 console enabled at `/h2-console`
+- PostgreSQL as the primary database for development and production
 - Server runs on port `8080`
 
 ### Test Configuration
-Test configuration (`src/test/resources/application-test.yml`) uses an isolated in-memory DB and `create-drop` schema.
+Test configuration (`src/test/resources/application-test.yml`) uses an in-memory H2 database and `create-drop` schema for isolated integration tests only.
 
 ## Running the Application
 
@@ -39,13 +38,10 @@ Using the Gradle Wrapper:
 
 The app will start on `http://localhost:8080`.
 
-### H2 Database Console
-Access the H2 console for database inspection:
-```text
-URL:      http://localhost:8080/h2-console
-JDBC URL: jdbc:h2:mem:loanappdb
-User:     sa
-Password: (leave empty)
+### Docker Environment (Recommended)
+To easily run both the API and database in a local environment, use:
+```bash
+docker-compose up --build
 ```
 
 ## Building
@@ -60,7 +56,7 @@ Password: (leave empty)
 ./gradlew bootJar
 ```
 
-Artifacts are produced under `build/` directory.
+Artifacts are produced under the `build/` directory.
 
 ## Testing
 
@@ -79,13 +75,14 @@ Integration tests are located in `src/test/kotlin/com/loanapp/` and use:
 - `@SpringBootTest` for full application context
 - `@TestPropertySource` for test-specific configuration
 - `BaseIntegrationTest` for common test setup
+- An in-memory H2 database configured specifically for tests only
 
 ## Local Development Tips
 
 ### Database Management
-- If you modify JPA entities, the default `ddl-auto: update` will evolve the in-memory schema at runtime
-- Use the H2 console to inspect tables (`AUTH_USER` etc.)
-- SQL logs are enabled by default via `spring.jpa.show-sql: true`
+- PostgreSQL is always used for local development unless running tests (which use H2 automatically)
+- Database connection configs are in `src/main/resources/application-dev.yml` (development) and `application-prod.yml` (production simulation)
+- SQL logs can be enabled via `spring.jpa.show-sql: true`
 
 ### Code Quality
 - Follow Kotlin coding conventions
@@ -111,25 +108,19 @@ Then run with Docker/Podman, exposing port 8080:
 docker run -p 8080:8080 loan-app-backend:latest
 ```
 
-### Production Considerations
-- Replace H2 with a production database (PostgreSQL, MySQL)
-- Configure proper security settings
-- Set up monitoring and logging
-- Use environment-specific configuration files
+### Cloud Deployment & CI/CD
+- Cloud simulation/staging is performed via Railway, with deploys triggered by pushing a version git tag (`v*`).
+- CI/CD workflows run on every pull request and tag push, building, linting, and testing your code, as well as enforcing commit/PR conventions.
+- See the main project README for full details on cloud deployment, tagging, and GitHub Actions.
 
 ## Troubleshooting
 
 ### Common Issues
 
-**H2 console not loading:**
-- Ensure the app is running
-- Visit `/h2-console` (exact path configured)
-- Check that H2 console is enabled in configuration
-
-**Cannot connect to database:**
-- Verify the JDBC URL matches the configuration
-- Check that the database driver is available
-- Ensure no other application is using the same database
+**Database connection errors:**
+- Verify PostgreSQL is running locally when not using Docker
+- JDBC URL must match your environment (see `application-dev.yml`)
+- H2 is only used for tests, not development/production
 
 **Port already in use:**
 - Change `server.port` in `application.yml`
@@ -143,5 +134,5 @@ docker run -p 8080:8080 loan-app-backend:latest
 
 ### Getting Help
 - Check application logs for detailed error messages
-- Review Spring Boot documentation
+- Review Spring Boot and Okta OAuth2 documentation
 - Consult Kotlin and Spring Security guides

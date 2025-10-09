@@ -15,57 +15,18 @@ http://localhost:8080/v3/api-docs
 ## Base Path
 All API endpoints are prefixed with `/v1/auth`
 
-## Authentication Endpoints
+## Authentication & User Management
+- **Authentication is handled externally by Okta via OAuth2.** This backend does not provide endpoints for password-based login or registration.
+- User profile-related endpoints (such as `/users/profile`) may exist for local profile information, but not for credential or session management.
 
-### Register User
-
-Creates a new user account in the system.
-
-**Endpoint:** `POST /v1/auth/register`
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "StrongPassword123!"
-}
-```
-
-**Success Response (201/200):**
-```json
-{
-  "id": "<uuid>",
-  "email": "user@example.com"
-}
-```
-
-**Error Responses:**
-- `400 Bad Request` - Invalid request data
-- `409 Conflict` - Email already exists
-
-**Example cURL:**
-```bash
-curl -X POST http://localhost:8080/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "StrongPassword123!"
-  }'
-```
+## Example Public/Protected Endpoints
+- Public or protected endpoints will require a valid OAuth2 token from Okta.
+- Any user registration or login should be performed via Okta's identity interface, not via this backend API.
 
 ## Security
-
-### Public Endpoints
-- `/v1/auth/register` - User registration
-- `/v1/auth/login` - User authentication (future implementation)
-
-### Protected Endpoints
-All other endpoints require authentication (future features).
-
-### Security Configuration
 - CSRF protection is disabled for API endpoints
-- BCrypt password encoding is used
-- Spring Security handles authentication and authorization
+- Authentication and authorization are delegated to Okta using OAuth2/JWT tokens
+- Spring Security is configured for resource server mode, validating Okta-issued tokens
 
 ## Error Handling
 
@@ -88,7 +49,3 @@ The following endpoints are planned for future implementation:
 - `POST /v1/payments/schedule` - Schedule payment
 - `GET /v1/payments/{id}` - Get payment details
 - `GET /v1/payments` - List user's payments
-
-### User Management
-- `GET /v1/users/profile` - Get user profile
-- `PUT /v1/users/profile` - Update user profile
