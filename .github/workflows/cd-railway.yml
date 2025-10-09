@@ -23,4 +23,4 @@ jobs:
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
         run: |
           echo "🚀 Deploying to Railway..."
-          RAILWAY_TOKEN=$RAILWAY_TOKEN railway up --service $RAILWAY_SERVICE_ID --project $RAILWAY_PROJECT_ID --detach
+          RAILWAY_TOKEN=$RAILWAY_TOKEN railway up --service $RAILWAY_SERVICE_ID --detach
