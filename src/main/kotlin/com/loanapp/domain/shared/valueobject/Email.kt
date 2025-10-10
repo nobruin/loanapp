@@ -4,6 +4,8 @@ data class Email(
     val value: String,
 ) {
     init {
+        require(value.isNotBlank()) { "Email cannot be blank" }
+        require(value.length <= 255) { "Email length must be less than or equal to 255 characters" }
         require(isValid(value)) { "Invalid email: $value" }
     }
 

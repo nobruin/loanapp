@@ -11,7 +11,9 @@ import java.util.UUID
 @Table(name = "customer")
 class CustomerEntity(
     @Id
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
+    @Column(name = "external_user_id", nullable = false, unique = true, length = 100)
+    val externalUserId: String,
     @Column(unique = true, nullable = false, length = 11)
     val cpf: String,
     @Column(name = "full_name", nullable = false)
@@ -20,8 +22,8 @@ class CustomerEntity(
     val birthDate: LocalDate,
     @Column(nullable = false)
     val address: String,
-    @Column
-    val email: String? = null,
+    @Column(nullable = false)
+    val email: String,
     @Column
     val phone: String? = null,
 )

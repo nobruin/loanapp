@@ -28,6 +28,7 @@ class CustomerRepositoryImplTest
                 email = Email("john.doe@example.com"),
                 phone = Phone("+5511987654321"),
                 address = "123 Main St",
+                externalUserId = UUID.randomUUID().toString(),
             )
 
         @Test
