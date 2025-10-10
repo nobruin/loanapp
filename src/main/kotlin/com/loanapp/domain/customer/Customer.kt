@@ -8,10 +8,11 @@ import java.time.LocalDate
 
 data class Customer(
     val id: Id<Customer>,
+    val externalUserId: String,
     val fullName: String,
     val cpf: Cpf,
     val birthDate: LocalDate,
-    val email: Email?,
+    val email: Email,
     val phone: Phone?,
     val address: String,
 )

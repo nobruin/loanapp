@@ -1,0 +1,2 @@
+ALTER TABLE customer
+ADD COLUMN external_user_id VARCHAR(100) NOT NULL UNIQUE;
