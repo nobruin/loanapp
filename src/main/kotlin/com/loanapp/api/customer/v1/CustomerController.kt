@@ -1,9 +1,9 @@
-package com.loanapp.api.customer
+package com.loanapp.api.customer.v1
 
 import com.loanapp.api.customer.dto.RegisterCustomerRequest
+import com.loanapp.api.customer.dto.RegisterCustomerResult
 import com.loanapp.application.customer.RegisterCustomerUseCase
 import com.loanapp.application.customer.dto.RegisterCustomerCommand
-import com.loanapp.application.customer.dto.RegisterCustomerResult
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/v1/customers")
 class CustomerController(
     private val createCustomerUseCase: RegisterCustomerUseCase,
 ) {

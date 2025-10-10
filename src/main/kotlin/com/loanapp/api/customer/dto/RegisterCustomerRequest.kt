@@ -2,7 +2,7 @@ package com.loanapp.api.customer.dto
 
 import java.time.LocalDate
 
-class RegisterCustomerRequest(
+data class RegisterCustomerRequest(
     val fullName: String,
     val cpf: String,
     val birthDate: LocalDate,

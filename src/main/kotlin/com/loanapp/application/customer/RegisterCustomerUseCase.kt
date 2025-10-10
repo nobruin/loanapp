@@ -1,7 +1,7 @@
 package com.loanapp.application.customer
 
+import com.loanapp.api.customer.dto.RegisterCustomerResult
 import com.loanapp.application.customer.dto.RegisterCustomerCommand
-import com.loanapp.application.customer.dto.RegisterCustomerResult
 import com.loanapp.domain.customer.CustomerRepository
 import com.loanapp.infra.persistencie.customer.toDomain
 import org.springframework.stereotype.Service
