@@ -1,0 +1,21 @@
+name: Auto PR Description (Copilot)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  copilot-pr-description:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate PR description with Copilot
+        uses: github/copilot-write-pull-request@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          mode: overwrite

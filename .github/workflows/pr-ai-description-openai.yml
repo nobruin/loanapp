@@ -6,6 +6,7 @@ on:
 
 jobs:
   generate-pr-description:
+    if: false
     name: Generate PR Description via OpenAI
     runs-on: ubuntu-latest
     permissions:
