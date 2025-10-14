@@ -6,7 +6,7 @@ import com.loanapp.domain.customer.CustomerRepository
 /**
  * Interface for customer record validation strategies.
  */
-interface CustomerRegisterValidation {
+fun interface CustomerRegisterValidation {
     /**
      * Performs validation.
      * @param command The registration command.
