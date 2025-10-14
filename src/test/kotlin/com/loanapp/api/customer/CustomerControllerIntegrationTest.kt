@@ -27,7 +27,6 @@ class CustomerControllerIntegrationTest
                     fullName = "Jane Doe",
                     cpf = "98765432100",
                     birthDate = LocalDate.of(1995, 5, 10),
-                    email = "jane.doe@example.com",
                     phone = "+5511999999999",
                     address = "456 Another St",
                 )
@@ -36,11 +35,12 @@ class CustomerControllerIntegrationTest
         private fun performRequest(
             sub: String = "auth0|integrationTestUser",
             body: RegisterCustomerRequest = baseRequest,
+            email: String = "jane.doe@example.com",
         ) = mockMvc.post("/v1/customers") {
             with(
                 JwtFactory.withJwt(
                     sub = sub,
-                    email = baseRequest.email,
+                    email = email,
                 ),
             )
             contentType = MediaType.APPLICATION_JSON
@@ -59,18 +59,19 @@ class CustomerControllerIntegrationTest
 
         @Test
         fun `should return 400 when email already exists`() {
+            val email = "duplication_email@test.com"
             val duplicateEmailReq =
                 baseRequest.copy(
                     cpf = "12345678901",
-                    email = "duplication_email@test.com",
                 )
 
-            performRequest(sub = "auth1|userA", body = duplicateEmailReq).andExpect {
+            performRequest(sub = "auth1|userA", body = duplicateEmailReq, email = email).andExpect {
                 status { isCreated() }
             }
 
             performRequest(
                 sub = "auth2|userB",
+                email = email,
                 body =
                     duplicateEmailReq.copy(
                         cpf = "10987654321",
@@ -78,7 +79,7 @@ class CustomerControllerIntegrationTest
             ).andExpect {
                 status { isBadRequest() }
                 jsonPath("$.message") {
-                    value("Email ${duplicateEmailReq.email} is already in use")
+                    value("Email $email is already in use")
                 }
             }
         }
@@ -89,8 +90,8 @@ class CustomerControllerIntegrationTest
                 sub = "auth0|same-sub",
                 baseRequest.copy(
                     cpf = "44455566699",
-                    email = "singular@test.com",
                 ),
+                email = "singular@test.com",
             ).andExpect {
                 status { isCreated() }
             }
@@ -98,15 +99,12 @@ class CustomerControllerIntegrationTest
             val duplicateSubReq =
                 baseRequest.copy(
                     cpf = "44455566677",
-                    email = "newemail@test.com",
                 )
 
             performRequest(
                 sub = "auth0|same-sub",
-                body =
-                    duplicateSubReq.copy(
-                        email = "different_email@test.com",
-                    ),
+                body = duplicateSubReq,
+                email = "different_email@test.com",
             ).andExpect {
                 status { isBadRequest() }
                 jsonPath("$.message") {
@@ -120,19 +118,17 @@ class CustomerControllerIntegrationTest
             val duplicateCpfReq =
                 baseRequest.copy(
                     cpf = "11011011102",
-                    email = "email@test.com",
                 )
 
-            performRequest(sub = "auth3|userD", body = duplicateCpfReq).andExpect {
+            performRequest(sub = "auth3|userD", body = duplicateCpfReq, email = "email@test.com").andExpect {
                 status { isCreated() }
             }
 
             performRequest(
                 sub = "auth4|userE",
                 body =
-                    duplicateCpfReq.copy(
-                        email = "different_email@test.com",
-                    ),
+                duplicateCpfReq,
+                email = "different_email@test.com",
             ).andExpect {
                 status { isBadRequest() }
                 jsonPath("$.message") {
