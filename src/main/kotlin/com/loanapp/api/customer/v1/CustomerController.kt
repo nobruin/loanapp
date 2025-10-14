@@ -25,6 +25,9 @@ class CustomerController(
         @RequestBody request: RegisterCustomerRequest,
     ): RegisterCustomerResult {
         val externalUserId = jwt.subject
+        val email =
+            jwt.claims["email"] as? String
+                ?: throw IllegalArgumentException("Missing email claim in JWT")
 
         return createCustomerUseCase.execute(
             RegisterCustomerCommand(
@@ -32,7 +35,7 @@ class CustomerController(
                 fullName = request.fullName,
                 cpf = request.cpf,
                 birthDate = request.birthDate,
-                email = request.email,
+                email = email,
                 phone = request.phone,
                 address = request.address,
             ),
