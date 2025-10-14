@@ -1,21 +1,39 @@
-name: Auto PR Description (Copilot)
+name: Auto PR Description (GitHub AI Suggestion)
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize] # Runs when a PR is opened or new commits are pushed
 
 jobs:
-  copilot-pr-description:
+  generate-pr-description:
+    name: Generate PR Description via GitHub AI
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
+      pull-requests: write # ESSENTIAL to update the PR body
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Generate PR description with Copilot
-        uses: github/copilot-write-pull-request@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          mode: overwrite
+          fetch-depth: 0 # Ensures all commit history is available
+
+      - name: Update PR description with AI Suggestion
+        env:
+          # O GITHUB_TOKEN é injetado automaticamente e tem as permissões do 'pull-requests: write'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          
+          # 1. Edita o PR usando o comando 'gh pr edit'.
+          # 2. --body-suggested: Diz ao gh CLI para usar o mecanismo de IA do GitHub 
+          #    (que inclui o Copilot, se disponível) para gerar o corpo da descrição.
+          # 3. --skip-editor: Evita que o comando abra um editor interativo.
+          
+          echo "Attempting to generate and set suggested PR body for PR #$PR_NUMBER..."
+          
+          # Tenta gerar a sugestão e editar o PR.
+          # Se o PR já tiver um corpo ou se a sugestão falhar, ele não fará nada, mas não quebrará a Action.
+          gh pr edit "$PR_NUMBER" --body-suggested --skip-editor
+          
+          echo "Finished PR description update attempt."
