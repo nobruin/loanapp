@@ -4,7 +4,7 @@
 
 Swagger UI (interactive API docs):
 ```
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html
 ```
 
 OpenAPI JSON:

@@ -1,4 +1,4 @@
-package com.loanapp.application.customer.dto
+package com.loanapp.api.customer.dto
 
 import java.util.UUID
 

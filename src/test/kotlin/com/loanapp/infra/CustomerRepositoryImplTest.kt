@@ -5,8 +5,10 @@ import com.loanapp.domain.shared.valueobject.Cpf
 import com.loanapp.domain.shared.valueobject.Email
 import com.loanapp.domain.shared.valueobject.Id
 import com.loanapp.domain.shared.valueobject.Phone
+import com.loanapp.infra.persistencie.customer.CustomerJpaRepository
 import com.loanapp.infra.persistencie.customer.CustomerRepositoryImpl
 import com.loanapp.shared.BaseIntegrationTest
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertThrows
@@ -18,7 +20,13 @@ class CustomerRepositoryImplTest
     @Autowired
     constructor(
         private val repositoryImpl: CustomerRepositoryImpl,
+        private val jpaRepository: CustomerJpaRepository,
     ) : BaseIntegrationTest() {
+        @BeforeEach
+        fun setup() {
+            jpaRepository.deleteAll()
+        }
+
         private fun buildCustomer(cpf: String = "12345678904") =
             Customer(
                 id = Id.new(),
@@ -45,6 +53,9 @@ class CustomerRepositoryImplTest
                 assert(this == byCpf)
 
                 assert(id == customer.id)
+                assert(
+                    this.externalUserId == customer.externalUserId,
+                )
                 assert(cpf == customer.cpf)
                 assert(cpf.value == "12345678904")
             }
