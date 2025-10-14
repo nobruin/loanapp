@@ -1,0 +1,51 @@
+name: Auto PR Description (Commit Summary)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  generate_pr_description:
+    name: Generate PR Description
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Garante que todo o histórico de commits seja lido
+          fetch-depth: 0
+
+      - name: Generate PR Description from Commits
+        uses: octue/generate-pull-request-description@1.0.0.beta-2
+        id: pr_description
+        with:
+          pull_request_url: ${{ github.event.pull_request.url }}
+          api_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update PR body (Resilient Script)
+        # Este passo só roda se o output da action anterior for diferente de vazio
+        if: ${{ steps.pr_description.outputs.body != '' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const body = `${{ steps.pr_description.outputs.body }}`;
+            
+            // Verifica se o corpo já existe (para evitar substituições acidentais)
+            const currentBody = context.payload.pull_request.body;
+            
+            // Só atualiza se o PR ainda não tiver um corpo (ou seja, se for 'vazio')
+            if (!currentBody || currentBody.trim() === "") {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                body: body
+              });
+              console.log('PR body updated successfully.');
+            } else {
+              console.log('PR already has a description. Skipping automatic update.');
+            }

@@ -9,22 +9,14 @@ import org.springframework.stereotype.Service
 @Service
 class RegisterCustomerUseCase(
     private val customerRepository: CustomerRepository,
+    private val validations: List<CustomerRegisterValidation>,
 ) {
     fun execute(command: RegisterCustomerCommand): RegisterCustomerResult {
-        val customer =
-            command.toDomain().apply {
-                require(!customerRepository.isEmailInUse(email)) {
-                    "Email ${email.value} is already in use"
-                }
-
-                require(!customerRepository.isCpfInUse(cpf)) {
-                    "CPF ${cpf.value} is already in use"
-                }
-
-                require(!customerRepository.existsByExternalUserId(externalUserId)) {
-                    "User already linked to a customer"
-                }
-            }
+        // Run all validations using the strategy pattern
+        validations.forEach { validation ->
+            validation.perform(command, customerRepository)
+        }
+        val customer = command.toDomain()
 
         customerRepository.save(customer)
 
