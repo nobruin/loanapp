@@ -2,80 +2,104 @@ name: Auto PR Description (OpenAI)
 
 on:
   pull_request:
-    types: [opened, synchronize] # Runs when a PR is opened or new commits are pushed
+    types: [opened, synchronize]
 
 jobs:
   generate-pr-description:
     name: Generate PR Description via OpenAI
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write # Essential permission to update the PR body
-      contents: read       # Needed to check out the repository and read file contents
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Ensures all commit history is available
 
       - name: Collect commit messages
         id: collect
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          # Use gh CLI to fetch all commit messages for the current PR
-          COMMITS=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER/commits --jq '.[].commit.message' | sed 's/^/- /')
-          
-          # Create a unique delimiter for multiline output variable
-          DELIMITER=$(uuidgen)
-          
-          # Export the collected commit messages as a multiline output variable
-          echo "commits<<$DELIMITER" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "$DELIMITER" >> $GITHUB_OUTPUT
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          COMMITS=$(gh api "repos/${{ github.repository }}/pulls/$PR_NUMBER/commits" --jq '.[].commit.message' | sed 's/^/- /')
+          if [ -z "$COMMITS" ]; then
+            COMMITS="Initial commit for PR #$PR_NUMBER"
+          fi
+          {
+            echo "commits<<EOF"
+            echo "$COMMITS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Generate PR description with OpenAI
         id: openai
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          # Pass the collected multiline commit messages from the previous step
-          COMMIT_MESSAGES: ${{ steps.collect.outputs.commits }}
         run: |
-          # System prompt for the AI model, defining its role and output format
-          PROMPT="You are an assistant that writes concise, professional GitHub Pull Request descriptions. Summarize the following commits in markdown with clear sections:\n\n- **Summary:** short overview\n- **Details:** bullet points for technical work\n- **Impact:** mention affected modules, risks, or backward compatibility"
+          set -e
+          echo "OpenAI key length: ${#OPENAI_API_KEY}"
 
-          # Construct the JSON payload securely using jq to handle newlines and quotes
-          JSON_BODY=$(jq -n \
+          COMMITS_CONTENT="${{ steps.collect.outputs.commits }}"
+
+          # PROMPT multiline seguro
+          read -r -d '' PROMPT <<'EOF' || true
+          You are an assistant that writes concise, professional GitHub Pull Request descriptions.
+          Summarize the following commits in markdown with clear sections:
+          - **Summary:** short overview
+          - **Details:** bullet points for technical work
+          - **Impact:** mention affected modules, risks, or backward compatibility
+          EOF
+  
+            # Monta JSON com jq (evita problemas de escape)
+            JSON_BODY=$(jq -n \
             --arg model "gpt-4o-mini" \
-            --arg system_prompt "$PROMPT" \
-            --arg user_content "Commits:\n${COMMIT_MESSAGES}" \
+            --arg sys "$PROMPT" \
+            --arg usr "Commits:\n$COMMITS_CONTENT" \
+            --argjson temp 0.4 \
             '{
-              "model": $model,
-              "messages": [
-                {"role": "system", "content": $system_prompt},
-                {"role": "user", "content": $user_content}
-              ],
-              "temperature": 0.4
-            }')
+          model: $model,
+          temperature: $temp,
+          messages: [
+            {role: "system", content: $sys},
+            {role: "user", content: $usr}
+          ]
+          }')
 
-          # Send the request to OpenAI API and extract the content of the response
-          BODY=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
-            -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d "$JSON_BODY" | jq -r '.choices[0].message.content')
-
-          # Create a unique delimiter for the final AI response
-          DELIMITER_OUT=$(uuidgen)
-
-          # Export the AI-generated description as a multiline output variable
-          echo "body<<$DELIMITER_OUT" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
-          echo "$DELIMITER_OUT" >> $GITHUB_OUTPUT
-
-      - name: Update PR description
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Use the gh CLI to update the PR body with the AI-generated content
-          gh pr edit ${{ github.event.pull_request.number }} --body "${{ steps.openai.outputs.body }}"
+          echo "JSON request:"
+          echo "$JSON_BODY" | jq '.'
+  
+          RESPONSE=$(curl --http1.1 -s -w "\n%{http_code}" -X POST "https://api.openai.com/v1/chat/completions" \
+          -H "Authorization: Bearer $OPENAI_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d "$JSON_BODY")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY_JSON=$(echo "$RESPONSE" | sed '$d')
+          
+          echo "OpenAI response ($HTTP_CODE):"
+          echo "$BODY_JSON" | jq '.' || echo "$BODY_JSON"
+          
+          if [ "$HTTP_CODE" -ne 200 ]; then
+          echo "OpenAI API returned HTTP $HTTP_CODE"
+          exit 1
+          fi
+          
+          DESC=$(echo "$BODY_JSON" | jq -r '.choices[0].message.content // empty')
+          if [ -z "$DESC" ]; then
+          DESC="⚠️ Failed to generate PR description automatically."
+          fi
+          
+          {
+            echo "body<<EOF"
+            echo "$DESC"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          
+          - name: Update PR description
+            env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run: |
+              gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                -X PATCH \
+                -f body='${{ steps.openai.outputs.body }}'
